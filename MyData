@@ -1,0 +1,110 @@
+class MyData:
+    
+    def __init__(self):
+        
+        self.filename = 'NoFile'
+        self.x = 0 
+        self.nx = 0
+        self.y = 0
+        self.ny = 0
+        self.z = 0
+        self.nz = 0
+        self.number_of_columns = 0
+        
+    def GetData(self,filename):
+        
+        self.filename = filename
+        data = np.loadtxt(filename)
+        
+        try:
+            self.x,self.y,self.z = data.transpose()
+            self.number_of_columns = 3
+            return len(self.x),len(self.y), len(self.z)
+            print "Column X is {} entries long, Column Y is {}, and Column Z is {}. The number of columns is {}.".format(len(self.x),len(self.y),len(self.z),self.number_of_columns)
+            
+        except ValueError:
+            
+            try:
+                self.x, self.y = data.transpose()
+                self.number_of_columns = 2 
+                print "Column X is {} entries long, Column Y is {}. The number of columns is {}.".format(len(self.x),len(self.y),self.number_of_columns)
+                
+            except ValueError:
+                self.x = data.transpose()
+                self.number_of_columns = 1
+                print "Column X is {} entries long. The number of columns is {}.".format(len(self.x),self.number_of_columns)
+        
+        
+                
+        
+        
+    
+    def PlotPointsXY(self):
+        plt.scatter(self.x,self.y)
+        plt.title(self.filename)
+        plt.xlabel('x-axis')
+        plt.ylabel('y-axis')
+
+    
+class Model:
+    
+    def __init__(self):
+   
+        self.npt = 0
+        self.x = []
+        self.y = []
+        self.type = 'undefined'
+        
+            
+
+    
+    def Xarray(self, npt, xmin, xmax):
+        
+    #creates an array to replace self.x, array is linearly spaced from the first x value to the final x value,
+    #spaced at points equal to the number of data points in the array
+    
+    #an instance of model 
+        
+        self.npt = npt
+        self.xmin = xmin
+        self.xmax = xmax
+        
+        self.x = np.linspace(xmin, xmax, npt)
+        
+    def Gaussian(self, xbar=0., sigma=1., total_under_curve=0.):
+        
+        self.type = 'Gaussian'
+        self.xbar = xbar
+        self.sigma = sigma
+        self.total_under_curve = total_under_curve
+        
+        self.y = total_under_curve*(1./(sigma*np.sqrt((2.*np.pi)))*np.exp(-((self.x-xbar)**2/(2.*sigma**2))))
+      
+    
+    def Blackbody(self, temperature):
+        
+        self.type = 'Blackbody'
+    
+    #assuming that self.x is an array of wavelengths:
+        h = 6.26**-34 #in units of m^2*kg*s^-1, planck's constant
+        c = 3.**8 #in units of m*s^2, speed of light
+        k = 1.38**-23 #in units of m^2*kg*s^-2*K^-1, boltzmann's constant
+        
+        self.y = (2*h*c**2) / ((self.x**5)*(np.exp(h*c) / (self.x*k*temperature)-1))
+      
+        
+        
+    def Linear(self, A, B):
+        
+        self.A = A
+        self.B = B
+        
+        #self.y = 
+        
+        self.type = 'Linear'
+       
+        self.sigma = np.sqrt(self.y)
+        
+        return (self.y - (A+B)*self.x)
+        
+    
