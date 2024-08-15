@@ -1,0 +1,96 @@
+class MyStats:
+    
+    def __init__(self,data, model):
+        self.data = data
+        self.model = model
+        self.lr = []
+            
+    def info(self):
+        
+        if self.data.number_of_columns == 3:
+            print "the number of Data points in all columns is: {} ".format(len(self.data.x))
+            print "the mean of Columns X, Y, and Z respectively are: {},{},{}".format(np.mean(self.data.x),np.mean(self.data.y),np.mean(self.data.z))
+            print "the standard deviation of Columns X, Y, and Z respectively are: {}, {}, {}".format(np.std(self.data.x),np.std(self.data.y),np.std(self.data.z))
+            print "the median of Columns X, Y, and Z respectively are: {}, {}, {}".format(np.median(self.data.x),np.median(self.data.y),np.median(self.data.z))
+        
+        if self.data.number_of_columns == 2:
+            print "the number of Data points in all columns is: {} ".format(len(self.data.x))
+            print "the mean of Columns X and Y respectively are: {},{}".format(np.mean(self.data.x),np.mean(self.data.y))
+            print "the standard deviation of Columns X and Y respectively are: {}, {}".format(np.std(self.data.x),np.std(self.data.y))
+            print "the median of Columns X and Y respectively are: {}, {}".format(np.median(self.data.x),np.median(self.data.y))
+            
+        if self.data.number_of_columns == 1:
+            print "the number of Data points in all columns is: {} ".format(len(self.data.x))
+            print "the mean of Columns X is: {},{}".format(np.mean(self.data.x))
+            print "the standard deviation of Columns X is {}".format(np.std(self.data.x))
+            print "the median of Columns X is: {}".format(np.median(self.data.x))
+    
+
+    def LinReg(self):
+        
+        
+        def LinearRegression(x,y):
+        
+        #need to calculate the sums of my x and y values and their squares:
+          
+        
+            N = len(x)
+        
+            x_sum = np.sum(x)
+            x_squared_sum = np.sum(x*x)
+            y_sum = np.sum(y)
+            y_squared_sum = np.sum(y*y)
+        
+        #the sums of my x and y's
+        
+            x_y_sum = np.sum(x*y)
+        
+        #setting their initial standard deviations to be 0
+        
+            std_x_squared = 0
+            std_y_squared = 0 
+            std_x_y = 0 
+        
+        #creating a list of my standard deviations utilizing a for loop to plug in values for
+        #each element 
+        
+            for i in range(N):
+                std_x_squared = std_x_squared + (np.mean(x)-x[i])**2
+                std_y_squared = std_y_squared + (np.mean(y)-y[i])**2
+                std_x_y = std_x_y + (np.mean(x)-x[i])*(np.mean(y)-y[i])
+                
+           #writing the equations from Taylor for A,B,r in code format
+        
+            delta = N*x_squared_sum - x_sum**2
+            A = (x_squared_sum * y_sum - x_sum *x_y_sum) / delta
+            B = (N*x_y_sum - x_sum * y_sum) / delta
+            r = std_x_y/ (std_x_squared**.5*y_squared_sum**.5)
+            
+            
+        
+            plt.plot(x,B*x+A)
+            plt.scatter(x,y)
+        
+        #this parameter p is the significance of our result
+        
+            p = pearsonr(x,y)
+    
+            self.LinearRegression = [A,B,r,N,p[1]]
+            return [A,B,r,N,p[1]]
+           
+    
+        a = self.data.x
+        b = self.data.y
+        c = self.data.z
+        
+    
+        if self.data.number_of_columns == 2:
+            self.lr = LinearRegression(a,b)
+            return LinearRegression(a,b)
+        
+        elif self.data.number_of_columns == 3:
+            self.lr = np.array([LinearRegression(a,b),LinearRegression(a,c), LinearRegression(b,c)])
+            return LinearRegression (a,b), LinearRegression(a,c), LinearRegression(b,c)
+        
+    #ef S_Stats(self):
+     #   return np.sum((Data.y[i]-N-B*Data.x[i])**2 / (self.sigma)**2*(Data.y)
